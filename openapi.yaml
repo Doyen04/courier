@@ -20,6 +20,8 @@ tags:
   - name: Itineraries
   - name: Agreements
   - name: Authentication
+  - name: Delivery
+  - name: Support
 paths:
   /health:
     get:
@@ -33,6 +35,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessEnvelope'
+  /ready:
+    get:
+      tags: [Health]
+      summary: Check application and database readiness
+      security: []
+      responses:
+        '200':
+          description: The application can access its database.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '503':
+          description: Database connectivity is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
   /auth/register:
     post:
       tags: [Authentication]
@@ -53,6 +73,79 @@ paths:
                 $ref: '#/components/schemas/SuccessEnvelope'
         '422':
           $ref: '#/components/responses/ValidationError'
+  /auth/verify-email:
+    post:
+      tags: [Authentication]
+      summary: Consume a single-use email verification token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token: { type: string, minLength: 32, maxLength: 100 }
+      responses:
+        '200': { description: Address verified. }
+        '400': { description: Token is invalid or expired. }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /auth/resend-verification:
+    post:
+      tags: [Authentication]
+      summary: Request another verification email
+      description: Returns the same accepted response whether or not the address needs verification.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200': { description: Request accepted without account enumeration. }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /auth/request-password-reset:
+    post:
+      tags: [Authentication]
+      summary: Request a password-reset email
+      description: Returns the same accepted response whether or not a verified account uses the address.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200': { description: Request accepted without account enumeration. }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /auth/reset-password:
+    post:
+      tags: [Authentication]
+      summary: Set a new password using a single-use token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string, minLength: 32, maxLength: 100 }
+                password: { type: string, minLength: 12, maxLength: 128 }
+      responses:
+        '200': { description: Password updated and existing sessions invalidated. }
+        '400': { description: Token is invalid or expired. }
+        '422': { $ref: '#/components/responses/ValidationError' }
   /requests:
     get:
       tags: [Requests]
@@ -245,6 +338,42 @@ paths:
           $ref: '#/components/responses/NotFound'
         '503':
           $ref: '#/components/responses/AuthUnavailable'
+    patch:
+      tags: [Itineraries]
+      summary: Update an owned itinerary while it is planned
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateItinerary'
+      responses:
+        '200':
+          description: Updated itinerary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    delete:
+      tags: [Itineraries]
+      summary: Cancel an owned planned itinerary
+      responses:
+        '200':
+          description: Cancelled itinerary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
   /itineraries/{itineraryId}/matches:
     parameters:
       - name: itineraryId
@@ -287,42 +416,6 @@ paths:
                 $ref: '#/components/schemas/SuccessEnvelope'
         '404':
           $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '503':
-          $ref: '#/components/responses/AuthUnavailable'
-    patch:
-      tags: [Itineraries]
-      summary: Update an owned itinerary while it is planned
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateItinerary'
-      responses:
-        '200':
-          description: Updated itinerary.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelope'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '422':
-          $ref: '#/components/responses/ValidationError'
-        '503':
-          $ref: '#/components/responses/AuthUnavailable'
-    delete:
-      tags: [Itineraries]
-      summary: Cancel an owned planned itinerary
-      responses:
-        '200':
-          description: Cancelled itinerary.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessEnvelope'
         '409':
           $ref: '#/components/responses/Conflict'
         '503':
@@ -442,6 +535,120 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /agreements/{agreementId}/handoff:
+    post:
+      tags: [Delivery]
+      summary: Mark the funded agreement as being handed off (traveler only)
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Handoff started after verifying a funded payment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /agreements/{agreementId}/delivery-confirmation:
+    post:
+      tags: [Delivery]
+      summary: Confirm receipt as the requester and queue a release request
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: Delivery confirmation recorded; payment release is pending provider processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /agreements/{agreementId}/disputes:
+    post:
+      tags: [Delivery]
+      summary: Open a dispute as an agreement participant
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              additionalProperties: false
+              properties:
+                reason: { type: string, minLength: 10, maxLength: 2000 }
+      responses:
+        '201':
+          description: Dispute opened; agreement is blocked from release.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /support/disputes:
+    get:
+      tags: [Support]
+      summary: List disputes for configured support operators
+      responses:
+        '200':
+          description: Disputes and limited participant/payment context.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /support/disputes/{disputeId}/review:
+    post:
+      tags: [Support]
+      summary: Move an open dispute into support review
+      parameters:
+        - name: disputeId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Dispute is under review and remains blocked from release.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
 components:
@@ -635,6 +842,12 @@ components:
             $ref: '#/components/schemas/ErrorEnvelope'
     AuthUnavailable:
       description: An authentication provider has not been configured.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Forbidden:
+      description: The signed-in user is not permitted to perform this operation.
       content:
         application/json:
           schema:
