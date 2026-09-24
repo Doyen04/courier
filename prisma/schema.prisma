@@ -1,0 +1,293 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RequestStatus {
+  DRAFT
+  OPEN
+  MATCHED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum ItineraryStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchStatus {
+  CANDIDATE
+  INTERESTED
+  AGREEMENT_STARTED
+  DECLINED
+  EXPIRED
+}
+
+enum AgreementStatus {
+  DRAFT
+  AWAITING_ACCEPTANCE
+  ACCEPTED
+  FUNDED
+  IN_HANDOFF
+  DELIVERED
+  RELEASE_PENDING
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  REFUNDED
+}
+
+enum TermsRevisionStatus {
+  PROPOSED
+  ACCEPTED
+  REJECTED
+  SUPERSEDED
+}
+
+enum PaymentStatus {
+  CREATED
+  REQUIRES_ACTION
+  AUTHORIZED
+  CAPTURED
+  HELD
+  REFUND_PENDING
+  REFUNDED
+  RELEASE_PENDING
+  RELEASED
+  FAILED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_REQUESTER
+  RESOLVED_TRAVELER
+  CANCELLED
+}
+
+model User {
+  id                   String                @id @default(uuid()) @db.Uuid
+  email                String                @unique
+  displayName          String
+  imageUrl             String?
+  disabledAt           DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  authIdentities       AuthIdentity[]
+  requests             ItemRequest[]
+  itineraries          Itinerary[]
+  requesterAgreements  Agreement[]           @relation("AgreementRequester")
+  travelerAgreements   Agreement[]           @relation("AgreementTraveler")
+  proposedTerms        TermsRevision[]        @relation("TermsProposer")
+  acceptedDeliveries  DeliveryConfirmation[]
+  openedDisputes       Dispute[]              @relation("DisputeOpener")
+  auditEvents          AuditEvent[]
+
+  @@index([createdAt])
+}
+
+model AuthIdentity {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider   String   @db.VarChar(80)
+  subject    String   @db.VarChar(255)
+  createdAt  DateTime @default(now())
+
+  @@unique([provider, subject])
+  @@index([userId])
+}
+
+model ItemRequest {
+  id                  String        @id @default(uuid()) @db.Uuid
+  requesterId         String        @db.Uuid
+  requester           User          @relation(fields: [requesterId], references: [id], onDelete: Restrict)
+  title               String        @db.VarChar(120)
+  description         String        @db.VarChar(4000)
+  itemCostMinor       Int
+  currency            String        @db.VarChar(3)
+  originName          String        @db.VarChar(180)
+  originCountryCode   String        @db.Char(2)
+  originLatitude      Decimal?      @db.Decimal(9, 6)
+  originLongitude     Decimal?      @db.Decimal(9, 6)
+  destinationName     String        @db.VarChar(180)
+  destinationCountryCode String     @db.Char(2)
+  destinationLatitude Decimal?      @db.Decimal(9, 6)
+  destinationLongitude Decimal?     @db.Decimal(9, 6)
+  neededBy            DateTime?     @db.Date
+  status              RequestStatus @default(OPEN)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  matches             RouteMatch[]
+
+  @@index([requesterId, status, createdAt])
+  @@index([originCountryCode, destinationCountryCode, neededBy])
+}
+
+model Itinerary {
+  id                    String          @id @default(uuid()) @db.Uuid
+  travelerId            String          @db.Uuid
+  traveler              User            @relation(fields: [travelerId], references: [id], onDelete: Restrict)
+  originName            String          @db.VarChar(180)
+  originCountryCode     String          @db.Char(2)
+  originLatitude        Decimal?        @db.Decimal(9, 6)
+  originLongitude       Decimal?        @db.Decimal(9, 6)
+  destinationName       String          @db.VarChar(180)
+  destinationCountryCode String         @db.Char(2)
+  destinationLatitude   Decimal?        @db.Decimal(9, 6)
+  destinationLongitude  Decimal?        @db.Decimal(9, 6)
+  routeStops            Json?
+  departureAt           DateTime
+  arrivalBy             DateTime
+  status                ItineraryStatus @default(PLANNED)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  matches               RouteMatch[]
+
+  @@index([travelerId, status, departureAt])
+  @@index([originCountryCode, destinationCountryCode, departureAt])
+}
+
+model RouteMatch {
+  id            String      @id @default(uuid()) @db.Uuid
+  requestId     String      @db.Uuid
+  request       ItemRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  itineraryId   String      @db.Uuid
+  itinerary     Itinerary   @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  status        MatchStatus @default(CANDIDATE)
+  score         Decimal?    @db.Decimal(5, 4)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  agreement     Agreement?
+
+  @@unique([requestId, itineraryId])
+  @@index([itineraryId, status])
+  @@index([requestId, status])
+}
+
+model Agreement {
+  id                    String                @id @default(uuid()) @db.Uuid
+  matchId               String                @unique @db.Uuid
+  match                 RouteMatch            @relation(fields: [matchId], references: [id], onDelete: Restrict)
+  requesterId           String                @db.Uuid
+  requester             User                  @relation("AgreementRequester", fields: [requesterId], references: [id], onDelete: Restrict)
+  travelerId            String                @db.Uuid
+  traveler              User                  @relation("AgreementTraveler", fields: [travelerId], references: [id], onDelete: Restrict)
+  status                AgreementStatus       @default(DRAFT)
+  fundedTermsSnapshot   Json?
+  termsLockedAt         DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  termsRevisions        TermsRevision[]
+  payments              PaymentTransaction[]
+  deliveryConfirmation  DeliveryConfirmation?
+  dispute               Dispute?
+
+  @@index([requesterId, status, updatedAt])
+  @@index([travelerId, status, updatedAt])
+}
+
+model TermsRevision {
+  id                   String              @id @default(uuid()) @db.Uuid
+  agreementId          String              @db.Uuid
+  agreement            Agreement           @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  revision             Int
+  proposedById         String              @db.Uuid
+  proposedBy           User                @relation("TermsProposer", fields: [proposedById], references: [id], onDelete: Restrict)
+  itemDescription      String              @db.VarChar(4000)
+  itemCostMinor        Int
+  deliveryFeeMinor     Int
+  totalMinor           Int
+  currency             String              @db.VarChar(3)
+  handoffDetails       Json?
+  status               TermsRevisionStatus @default(PROPOSED)
+  requesterAcceptedAt  DateTime?
+  travelerAcceptedAt   DateTime?
+  createdAt            DateTime            @default(now())
+
+  @@unique([agreementId, revision])
+  @@index([agreementId, status])
+}
+
+model PaymentTransaction {
+  id                    String       @id @default(uuid()) @db.Uuid
+  agreementId           String       @db.Uuid
+  agreement             Agreement    @relation(fields: [agreementId], references: [id], onDelete: Restrict)
+  provider              String       @db.VarChar(80)
+  providerPaymentId     String?      @unique
+  idempotencyKey        String       @unique @db.VarChar(180)
+  amountMinor           Int
+  currency              String       @db.VarChar(3)
+  status                PaymentStatus @default(CREATED)
+  authorizedAt          DateTime?
+  capturedAt            DateTime?
+  refundedAt            DateTime?
+  releasedAt            DateTime?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  providerEvents        ProviderEventReceipt[]
+
+  @@index([agreementId, status])
+}
+
+model ProviderEventReceipt {
+  id                    String             @id @default(uuid()) @db.Uuid
+  provider              String             @db.VarChar(80)
+  providerEventId       String             @db.VarChar(220)
+  paymentTransactionId  String?            @db.Uuid
+  paymentTransaction    PaymentTransaction? @relation(fields: [paymentTransactionId], references: [id], onDelete: SetNull)
+  eventType             String             @db.VarChar(120)
+  safeSummary           Json?
+  processedAt           DateTime?
+  receivedAt            DateTime           @default(now())
+
+  @@unique([provider, providerEventId])
+  @@index([processedAt, receivedAt])
+}
+
+model DeliveryConfirmation {
+  id             String    @id @default(uuid()) @db.Uuid
+  agreementId    String    @unique @db.Uuid
+  agreement      Agreement @relation(fields: [agreementId], references: [id], onDelete: Restrict)
+  requesterId    String    @db.Uuid
+  requester      User      @relation(fields: [requesterId], references: [id], onDelete: Restrict)
+  confirmedAt    DateTime  @default(now())
+  note           String?   @db.VarChar(1000)
+}
+
+model Dispute {
+  id             String        @id @default(uuid()) @db.Uuid
+  agreementId    String        @unique @db.Uuid
+  agreement      Agreement     @relation(fields: [agreementId], references: [id], onDelete: Restrict)
+  openedById     String        @db.Uuid
+  openedBy       User          @relation("DisputeOpener", fields: [openedById], references: [id], onDelete: Restrict)
+  reason         String        @db.VarChar(2000)
+  status         DisputeStatus @default(OPEN)
+  resolutionNote String?       @db.VarChar(4000)
+  createdAt      DateTime      @default(now())
+  resolvedAt     DateTime?
+}
+
+model AuditEvent {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorId     String?  @db.Uuid
+  actor       User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  entityType  String   @db.VarChar(100)
+  entityId    String   @db.VarChar(100)
+  action      String   @db.VarChar(120)
+  metadata    Json?
+  requestId   String?  @db.VarChar(100)
+  createdAt   DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorId, createdAt])
+}
