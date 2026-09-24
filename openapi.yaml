@@ -1,0 +1,659 @@
+openapi: 3.1.0
+info:
+  title: Courier API
+  version: 1.0.0
+  description: >-
+    Versioned HTTP API for item requests and traveler itineraries. Protected
+    endpoints require an Auth.js session and scope results to the authenticated
+    owner. Initial matching requires the
+    request origin and destination to appear in order on the itinerary. Geocoded
+    locations may be within 30 km; without coordinates, normalized city and
+    country names must match. A request's neededBy date is treated as the latest
+    acceptable itinerary arrival date. Matching is advisory until the traveler
+    expresses interest.
+servers:
+  - url: /api/v1
+    description: Same-origin Courier API
+tags:
+  - name: Health
+  - name: Requests
+  - name: Itineraries
+  - name: Agreements
+  - name: Authentication
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Check application liveness
+      security: []
+      responses:
+        '200':
+          description: Application process is responding.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Create a Courier account with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterAccount'
+      responses:
+        '201':
+          description: Account accepted for creation without exposing whether the email already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /requests:
+    get:
+      tags: [Requests]
+      summary: List the signed-in requester's item requests
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [DRAFT, OPEN, MATCHED, IN_PROGRESS, COMPLETED, CANCELLED, EXPIRED]
+      responses:
+        '200':
+          description: Owner-scoped request page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    post:
+      tags: [Requests]
+      summary: Create an item request for the signed-in requester
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequest'
+      responses:
+        '201':
+          description: Request created in OPEN state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /requests/{requestId}:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Requests]
+      summary: Read an owned item request
+      responses:
+        '200':
+          description: Request details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    patch:
+      tags: [Requests]
+      summary: Update an owned request while it is open or a draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRequest'
+      responses:
+        '200':
+          description: Updated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    delete:
+      tags: [Requests]
+      summary: Cancel an owned open request
+      responses:
+        '200':
+          description: Cancelled request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /requests/{requestId}/matches:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Requests]
+      summary: Find travelers whose itinerary could carry this request
+      responses:
+        '200':
+          description: Owner-visible active candidate and interested matches, or NO_MATCHES.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /itineraries:
+    get:
+      tags: [Itineraries]
+      summary: List the signed-in traveler's itineraries
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PLANNED, ACTIVE, COMPLETED, CANCELLED]
+      responses:
+        '200':
+          description: Owner-scoped itinerary page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    post:
+      tags: [Itineraries]
+      summary: Create an itinerary for the signed-in traveler
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateItinerary'
+      responses:
+        '201':
+          description: Itinerary created in PLANNED state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /itineraries/{itineraryId}:
+    parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Itineraries]
+      summary: Read an owned itinerary
+      responses:
+        '200':
+          description: Itinerary details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /itineraries/{itineraryId}/matches:
+    parameters:
+      - name: itineraryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Itineraries]
+      summary: Find requests that could fit this itinerary
+      responses:
+        '200':
+          description: Traveler-visible active candidate and interested matches, or NO_MATCHES.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /matches/{matchId}/interest:
+    parameters:
+      - name: matchId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Itineraries]
+      summary: Let the owning traveler express interest in a candidate
+      responses:
+        '200':
+          description: Match moved to INTERESTED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    patch:
+      tags: [Itineraries]
+      summary: Update an owned itinerary while it is planned
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateItinerary'
+      responses:
+        '200':
+          description: Updated itinerary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    delete:
+      tags: [Itineraries]
+      summary: Cancel an owned planned itinerary
+      responses:
+        '200':
+          description: Cancelled itinerary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /agreements:
+    get:
+      tags: [Agreements]
+      summary: List agreements for the signed-in requester or traveler
+      responses:
+        '200':
+          description: Participant-scoped agreements.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Agreements]
+      summary: Start an agreement from a match where the traveler expressed interest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgreement'
+      responses:
+        '201':
+          description: Draft agreement created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /agreements/{agreementId}:
+    parameters:
+      - name: agreementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      tags: [Agreements]
+      summary: Read an agreement as one of its participants
+      responses:
+        '200':
+          description: Agreement and revision history.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /agreements/{agreementId}/terms:
+    post:
+      tags: [Agreements]
+      summary: Propose a new delivery fee and handoff details as the traveler
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposeTerms'
+      responses:
+        '201':
+          description: Terms proposed and awaiting requester acceptance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /agreements/{agreementId}/terms/{revisionId}/accept:
+    post:
+      tags: [Agreements]
+      summary: Accept the current complete terms as the requester
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: revisionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Terms accepted; agreement is eligible for payment initiation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /agreements/{agreementId}/cancel:
+    post:
+      tags: [Agreements]
+      summary: Cancel an unfunded agreement as either participant
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Agreement cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessEnvelope'
+        '409':
+          $ref: '#/components/responses/Conflict'
+components:
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Cursor:
+      name: cursor
+      in: query
+      description: ID of the last record in the previous page, owned by the signed-in user.
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    SuccessEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data: {}
+        meta:
+          type: object
+          required: [requestId]
+          properties:
+            requestId:
+              type: string
+    ErrorEnvelope:
+      type: object
+      required: [error, meta]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details: {}
+        meta:
+          type: object
+          required: [requestId]
+          properties:
+            requestId:
+              type: string
+    CreateAgreement:
+      type: object
+      required: [matchId]
+      additionalProperties: false
+      properties:
+        matchId: { type: string, format: uuid }
+    ProposeTerms:
+      type: object
+      required: [deliveryFeeMinor]
+      additionalProperties: false
+      properties:
+        deliveryFeeMinor: { type: integer, minimum: 0, maximum: 2000000000 }
+        handoffDetails:
+          type: object
+          required: [notes]
+          additionalProperties: false
+          properties:
+            notes: { type: string, minLength: 1, maxLength: 1000 }
+            suggestedMeetup: { type: string, minLength: 1, maxLength: 300 }
+    RegisterAccount:
+      type: object
+      required: [displayName, email, password]
+      additionalProperties: false
+      properties:
+        displayName: { type: string, minLength: 2, maxLength: 80 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 12, maxLength: 128 }
+    Coordinates:
+      type: object
+      properties:
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+      required: [latitude, longitude]
+    CreateRequest:
+      type: object
+      required: [title, description, itemCostMinor, currency, originName, originCountryCode, destinationName, destinationCountryCode]
+      additionalProperties: false
+      description: Origin and destination latitude/longitude values must be supplied as pairs.
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        description: { type: string, minLength: 1, maxLength: 4000 }
+        itemCostMinor: { type: integer, minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+        originName: { type: string, minLength: 1, maxLength: 180 }
+        originCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        originLatitude: { type: number, minimum: -90, maximum: 90 }
+        originLongitude: { type: number, minimum: -180, maximum: 180 }
+        destinationName: { type: string, minLength: 1, maxLength: 180 }
+        destinationCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        destinationLatitude: { type: number, minimum: -90, maximum: 90 }
+        destinationLongitude: { type: number, minimum: -180, maximum: 180 }
+        neededBy: { type: string, format: date }
+    UpdateRequest:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      description: Origin and destination latitude/longitude values must be supplied as pairs.
+      properties:
+        title: { type: string, minLength: 1, maxLength: 120 }
+        description: { type: string, minLength: 1, maxLength: 4000 }
+        itemCostMinor: { type: integer, minimum: 0 }
+        currency: { type: string, pattern: '^[A-Za-z]{3}$' }
+        originName: { type: string, minLength: 1, maxLength: 180 }
+        originCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        originLatitude: { type: number, minimum: -90, maximum: 90 }
+        originLongitude: { type: number, minimum: -180, maximum: 180 }
+        destinationName: { type: string, minLength: 1, maxLength: 180 }
+        destinationCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        destinationLatitude: { type: number, minimum: -90, maximum: 90 }
+        destinationLongitude: { type: number, minimum: -180, maximum: 180 }
+        neededBy: { type: [string, 'null'], format: date }
+    CreateItinerary:
+      type: object
+      required: [originName, originCountryCode, destinationName, destinationCountryCode, departureAt, arrivalBy]
+      additionalProperties: false
+      description: Arrival must be after departure. Coordinates must be supplied as pairs.
+      properties:
+        originName: { type: string, minLength: 1, maxLength: 180 }
+        originCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        originLatitude: { type: number, minimum: -90, maximum: 90 }
+        originLongitude: { type: number, minimum: -180, maximum: 180 }
+        destinationName: { type: string, minLength: 1, maxLength: 180 }
+        destinationCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        destinationLatitude: { type: number, minimum: -90, maximum: 90 }
+        destinationLongitude: { type: number, minimum: -180, maximum: 180 }
+        routeStops:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            required: [name, countryCode]
+            additionalProperties: false
+            properties:
+              name: { type: string, maxLength: 180 }
+              countryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+              latitude: { type: number, minimum: -90, maximum: 90 }
+              longitude: { type: number, minimum: -180, maximum: 180 }
+        departureAt: { type: string, format: date-time }
+        arrivalBy: { type: string, format: date-time }
+    UpdateItinerary:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      description: Arrival must be after departure when both dates are updated. Coordinates must be supplied as pairs.
+      properties:
+        originName: { type: string, minLength: 1, maxLength: 180 }
+        originCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        originLatitude: { type: number, minimum: -90, maximum: 90 }
+        originLongitude: { type: number, minimum: -180, maximum: 180 }
+        destinationName: { type: string, minLength: 1, maxLength: 180 }
+        destinationCountryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+        destinationLatitude: { type: number, minimum: -90, maximum: 90 }
+        destinationLongitude: { type: number, minimum: -180, maximum: 180 }
+        routeStops:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            required: [name, countryCode]
+            additionalProperties: false
+            properties:
+              name: { type: string, maxLength: 180 }
+              countryCode: { type: string, pattern: '^[A-Za-z]{2}$' }
+              latitude: { type: number, minimum: -90, maximum: 90 }
+              longitude: { type: number, minimum: -180, maximum: 180 }
+        departureAt: { type: string, format: date-time }
+        arrivalBy: { type: string, format: date-time }
+      description: Send one or more mutable fields. Unknown fields are rejected.
+  responses:
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    AuthUnavailable:
+      description: An authentication provider has not been configured.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    ValidationError:
+      description: The request body or query parameters are invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: The record does not exist or is not owned by the signed-in user.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Conflict:
+      description: The record is in a state that does not permit this operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
