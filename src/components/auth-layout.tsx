@@ -14,7 +14,7 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
     const isAccount = mode === "account";
 
     return (
-        <main className="min-h-dvh bg-[#fbfaf7] text-courier-ink lg:grid lg:grid-cols-[.94fr_1.06fr]">
+        <main className="flex min-h-dvh flex-col bg-[#fbfaf7] text-courier-ink lg:grid lg:grid-cols-[.94fr_1.06fr]">
             <aside className="relative isolate hidden min-h-dvh flex-col overflow-hidden bg-courier-green px-5 py-5 text-white lg:flex lg:px-[clamp(36px,6vw,92px)] lg:py-8">
                 <div className="hero-orbit absolute -right-28 -top-36 size-[380px] rounded-full border border-white/10" aria-hidden="true" />
                 <div className="hero-orbit hero-orbit-slower absolute -right-8 -top-16 size-[230px] rounded-full border border-white/10" aria-hidden="true" />
@@ -48,7 +48,7 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
                 </div>
             </aside>
 
-            <section className="flex min-h-[620px] flex-col px-5 py-8 sm:px-8 sm:py-10 lg:min-h-dvh lg:px-[clamp(40px,7vw,104px)] lg:py-8">
+            <section className="flex min-h-dvh flex-1 flex-col px-5 py-8 sm:px-8 sm:py-10 lg:px-[clamp(40px,7vw,104px)] lg:py-8">
 
                 <div className="mb-8 flex items-center justify-between gap-4 lg:hidden">
                     <BrandMark />
@@ -57,7 +57,7 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
                     </Link>
                 </div>
 
-                <div className="animate-enter-delayed my-auto w-full max-w-[480px] py-8 sm:py-12 lg:mx-auto lg:py-14">
+                <div className="animate-enter-delayed mx-auto my-auto w-full max-w-[480px] py-8 sm:py-12 lg:py-14">
                     <div className="rounded-[30px] border border-courier-line bg-white p-5 sm:rounded-[34px] sm:p-8 lg:p-9">
                         <div className="mb-7 flex items-center justify-between gap-4">
                             <span className="text-[10px] font-semibold uppercase tracking-widest text-courier-muted">Secure access</span>
