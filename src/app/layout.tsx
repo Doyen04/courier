@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Courier — Good things, carried together",
-    template: "%s · Courier",
+    default: "Courier | Good things, carried together",
+    template: "%s | Courier",
   },
   description:
     "Connect with a traveler already heading your way and get the things you need delivered with care.",

@@ -5,6 +5,7 @@ export type ApiErrorCode =
   | "NOT_FOUND"
   | "CONFLICT"
   | "VALIDATION_ERROR"
+  | "SERVICE_UNAVAILABLE"
   | "INTERNAL_ERROR";
 
 export type ApiError = {
@@ -30,6 +31,7 @@ export function apiSuccess<T>(
 ): Response {
   const headers = new Headers(init?.headers);
   headers.set("x-request-id", requestId);
+  headers.set("cache-control", headers.get("cache-control") ?? "no-store");
 
   return Response.json(
     { data, meta: { requestId } },
@@ -42,8 +44,9 @@ export function apiError(
   requestId: string,
   status: number,
 ): Response {
+  const headers = new Headers({ "x-request-id": requestId, "cache-control": "no-store" });
   return Response.json(
     { error, meta: { requestId } },
-    { status, headers: { "x-request-id": requestId } },
+    { status, headers },
   );
 }

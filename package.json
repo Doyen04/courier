@@ -18,6 +18,7 @@
     "dotenv": "^18.0.3",
     "next": "16.3.6",
     "next-auth": "beta",
+    "nodemailer": "^8.0.11",
     "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
