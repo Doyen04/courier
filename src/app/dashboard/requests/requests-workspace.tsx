@@ -127,7 +127,7 @@ export function RequestsWorkspace({ initiallyOpen = false }: { initiallyOpen?: b
         <WorkspaceHeading eyebrow="Requester workspace" title="My requests" description="Track the items you need and find travelers whose journeys fit." action={<PrimaryButton type="button" onClick={() => setFormOpen((open) => !open)}>{formOpen ? "Close form" : "+ New request"}</PrimaryButton>} />
         <InlineMessage error={error} notice={notice} onDismiss={() => { setError(null); setNotice(null); }} />
         {formOpen && <RequestForm onSubmit={createRequest} submitting={submitting} />}
-        {loading ? <LoadingPanel label="Loading your requests…" /> : items.length === 0 ? <EmptyState title="No requests yet" body="Add an item you need and we’ll match it with someone already travelling that way." action="Create a request" href="/dashboard/requests?new=1" /> : <div className="grid gap-4">{items.map((item) => <RequestCard key={item.id} item={item} panel={matches[item.id]} matching={matching === item.id} submitting={submitting} onMatches={() => void loadMatches(item.id)} onStartAgreement={startAgreement} onUpdate={updateRequest} onCancel={cancelRequest} />)}</div>}
+        {loading ? <LoadingPanel label="Loading your requests…" /> : items.length === 0 ? <EmptyState title="No requests yet" body="Add an item you need and we’ll match it with someone already travelling that way." action="Create a request" onAction={() => setFormOpen(true)} /> : <div className="grid gap-4">{items.map((item) => <RequestCard key={item.id} item={item} panel={matches[item.id]} matching={matching === item.id} submitting={submitting} onMatches={() => void loadMatches(item.id)} onStartAgreement={startAgreement} onUpdate={updateRequest} onCancel={cancelRequest} />)}</div>}
     </>;
 }
 

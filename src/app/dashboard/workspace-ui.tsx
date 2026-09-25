@@ -35,13 +35,14 @@ export function StatusBadge({ status }: { status: string }) {
     return <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ${attention ? "bg-[#fff1ee] text-[#9a4035]" : positive ? "bg-[#eaf3ec] text-courier-green" : inProgress ? "bg-[#f7efe3] text-[#805720]" : "bg-[#f2f3ef] text-courier-muted"}`}>{statusLabel(status)}</span>;
 }
 
-export function EmptyState({ title, body, href, action }: { title: string; body: string; href?: string; action?: string }) {
+export function EmptyState({ title, body, href, action, onAction }: { title: string; body: string; href?: string; action?: string; onAction?: () => void }) {
     return (
         <div className="rounded-2xl border border-dashed border-[#d7dfd8] bg-white px-6 py-10 text-center sm:px-10">
             <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-[#edf4ef] text-xl text-courier-green" aria-hidden="true">＋</span>
             <h2 className="mb-2 mt-4 font-display text-xl font-semibold tracking-tight">{title}</h2>
             <p className="mx-auto mb-0 max-w-md text-sm leading-6 text-courier-muted">{body}</p>
-            {href && action && <Link href={href} className="mt-5 inline-flex min-h-10 items-center rounded-xl bg-courier-green px-4 text-xs font-semibold text-white hover:bg-courier-green-deep">{action}</Link>}
+            {action && onAction && <button type="button" onClick={onAction} className="mt-5 inline-flex min-h-10 items-center rounded-xl bg-courier-green px-4 text-xs font-semibold text-white hover:bg-courier-green-deep">{action}</button>}
+            {href && action && !onAction && <Link href={href} className="mt-5 inline-flex min-h-10 items-center rounded-xl bg-courier-green px-4 text-xs font-semibold text-white hover:bg-courier-green-deep">{action}</Link>}
         </div>
     );
 }
