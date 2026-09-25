@@ -50,7 +50,9 @@ export async function listRequestsMatchingMyJourneys(travelerId: string) {
         take: 50,
     });
 
-    return journeys.filter((journey) => journey.matches.length > 0);
+    return journeys
+        .filter((journey) => journey.matches.length > 0)
+        .map(({ matches, ...itinerary }) => ({ itinerary, matches }));
 }
 
 export async function refreshRequestsMatchingMyJourneys(travelerId: string) {
@@ -93,7 +95,9 @@ export async function listJourneysMatchingMyRequests(requesterId: string) {
         take: 50,
     });
 
-    return requests.filter((request) => request.matches.length > 0);
+    return requests
+        .filter((request) => request.matches.length > 0)
+        .map(({ matches, ...request }) => ({ request, matches }));
 }
 
 export async function refreshJourneysMatchingMyRequests(requesterId: string) {

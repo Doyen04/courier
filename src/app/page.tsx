@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import { BrandMark } from "@/components/brand-mark";
 
 const steps = [
@@ -162,7 +163,12 @@ function HandoffScene() {
     );
 }
 
-export default function Home() {
+export default async function Home() {
+    const session = await auth();
+    const signedIn = Boolean(session?.user);
+    const signUpHref = signedIn ? "/dashboard" : "/sign-up";
+    const signInHref = signedIn ? "/dashboard" : "/sign-in";
+
     return (
         <main id="top" className="min-h-screen overflow-hidden bg-white text-courier-ink">
             <header className="sticky top-0 z-40 border-b border-courier-line bg-white/95 backdrop-blur-md">
@@ -174,8 +180,14 @@ export default function Home() {
                         <a className="transition-colors hover:text-courier-green" href="#handoff">Safe handoffs</a>
                     </nav>
                     <div className="flex items-center gap-3 sm:gap-5">
-                        <Link className="hidden min-h-10 items-center text-[12px] font-semibold text-courier-ink hover:text-courier-green min-[360px]:inline-flex" href="/sign-in">Sign in</Link>
-                        <Link className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-courier-green px-3.5 text-[11px] font-semibold text-white transition-colors hover:bg-courier-green-deep sm:min-h-12 sm:gap-3 sm:px-5 sm:text-[12px]" href="/sign-up">Get started <Arrow className="size-4 transition-transform group-hover:translate-x-1" /></Link>
+                        {signedIn ? (
+                            <Link className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-courier-green px-3.5 text-[11px] font-semibold text-white transition-colors hover:bg-courier-green-deep sm:min-h-12 sm:gap-3 sm:px-5 sm:text-[12px]" href="/dashboard">Go to dashboard <Arrow className="size-4 transition-transform group-hover:translate-x-1" /></Link>
+                        ) : (
+                            <>
+                                <Link className="hidden min-h-10 items-center text-[12px] font-semibold text-courier-ink hover:text-courier-green min-[360px]:inline-flex" href="/sign-in">Sign in</Link>
+                                <Link className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-courier-green px-3.5 text-[11px] font-semibold text-white transition-colors hover:bg-courier-green-deep sm:min-h-12 sm:gap-3 sm:px-5 sm:text-[12px]" href="/sign-up">Get started <Arrow className="size-4 transition-transform group-hover:translate-x-1" /></Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </header>
@@ -192,7 +204,7 @@ export default function Home() {
                             Courier connects an item that needs a journey with a traveler already heading there. Agree on the details, meet, and confirm the handoff together.
                         </p>
                         <div className="mt-8 flex flex-wrap items-center gap-3">
-                            <Link href="/sign-up" className="group inline-flex min-h-14 items-center gap-5 rounded-full bg-[#f1d39a] px-6 text-[13px] font-bold text-courier-ink transition-colors hover:bg-white">Send an item <Arrow className="size-4 transition-transform group-hover:translate-x-1" /></Link>
+                            <Link href={signUpHref} className="group inline-flex min-h-14 items-center gap-5 rounded-full bg-[#f1d39a] px-6 text-[13px] font-bold text-courier-ink transition-colors hover:bg-white">Send an item <Arrow className="size-4 transition-transform group-hover:translate-x-1" /></Link>
                             <a href="#for-everyone" className="inline-flex min-h-14 items-center gap-2 rounded-full border border-white/35 px-5 text-[13px] font-semibold text-white transition-colors hover:bg-white/10">I have a trip <Arrow className="size-4 text-[#f1d39a]" /></a>
                         </div>
                         <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-[11px] font-medium text-white/75">
@@ -268,7 +280,7 @@ export default function Home() {
                         </div>
                         <div className="px-6 py-7 sm:px-9 sm:py-8">
                             <p className="mb-6 max-w-110 text-[14px] leading-6 text-courier-muted">Share what you need carried, where it is going, and when it should arrive. Then review travelers whose trips may fit.</p>
-                            <Link href="/sign-up" className="group/link inline-flex min-h-12 items-center gap-3 rounded-full bg-courier-green px-5 text-[12px] font-semibold text-white transition-colors hover:bg-courier-green-deep">Post an item request <Arrow className="size-4 transition-transform group-hover/link:translate-x-1" /></Link>
+                            <Link href={signUpHref} className="group/link inline-flex min-h-12 items-center gap-3 rounded-full bg-courier-green px-5 text-[12px] font-semibold text-white transition-colors hover:bg-courier-green-deep">Post an item request <Arrow className="size-4 transition-transform group-hover/link:translate-x-1" /></Link>
                         </div>
                     </article>
                     <article className="reveal-on-scroll group overflow-hidden rounded-[30px] border border-[#d6e2d9] bg-white transition-transform duration-300 hover:-translate-y-1">
@@ -278,7 +290,7 @@ export default function Home() {
                         </div>
                         <div className="px-6 py-7 sm:px-9 sm:py-8">
                             <p className="mb-6 max-w-110 text-[14px] leading-6 text-courier-muted">Share a journey you already plan to make. Look through requests, and choose whether anything suits your route.</p>
-                            <Link href="/sign-up" className="group/link inline-flex min-h-12 items-center gap-3 rounded-full border border-courier-green px-5 text-[12px] font-semibold text-courier-green transition-colors hover:bg-[#eef4ef]">Share a trip <Arrow className="size-4 transition-transform group-hover/link:translate-x-1" /></Link>
+                            <Link href={signUpHref} className="group/link inline-flex min-h-12 items-center gap-3 rounded-full border border-courier-green px-5 text-[12px] font-semibold text-courier-green transition-colors hover:bg-[#eef4ef]">Share a trip <Arrow className="size-4 transition-transform group-hover/link:translate-x-1" /></Link>
                         </div>
                     </article>
                 </div>
@@ -335,7 +347,7 @@ export default function Home() {
                         <h2 className="mb-3 text-[clamp(2.2rem,4vw,3.7rem)] font-bold leading-[1.02] tracking-tighter">Your route might be just what someone needs.</h2>
                         <p className="mb-0 max-w-155 text-[15px] leading-6 text-courier-ink/80">Share a trip you already plan to make and see which requests may fit.</p>
                     </div>
-                    <Link href="/sign-up" className="group inline-flex min-h-14 shrink-0 items-center justify-between gap-8 rounded-full bg-courier-green px-6 text-[13px] font-semibold text-white transition-colors hover:bg-courier-green-deep">Share your trip <Arrow className="size-4 transition-transform group-hover:translate-x-1" /></Link>
+                    <Link href={signUpHref} className="group inline-flex min-h-14 shrink-0 items-center justify-between gap-8 rounded-full bg-courier-green px-6 text-[13px] font-semibold text-white transition-colors hover:bg-courier-green-deep">Share your trip <Arrow className="size-4 transition-transform group-hover:translate-x-1" /></Link>
                 </div>
             </section>
 
@@ -343,7 +355,7 @@ export default function Home() {
                 <div className="mx-auto flex max-w-330 flex-col gap-7 px-5 py-9 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
                     <div><BrandMark /><p className="mb-0 mt-3 text-[12px] text-courier-muted">A better way to carry what matters.</p></div>
                     <nav className="flex flex-wrap gap-x-6 gap-y-3 text-[12px] font-medium text-courier-muted" aria-label="Footer navigation">
-                        <a className="transition-colors hover:text-courier-green" href="#how-it-works">How it works</a><a className="transition-colors hover:text-courier-green" href="#for-everyone">For everyone</a><a className="transition-colors hover:text-courier-green" href="#handoff">Handoffs</a><Link className="transition-colors hover:text-courier-green" href="/sign-in">Sign in</Link>
+                        <a className="transition-colors hover:text-courier-green" href="#how-it-works">How it works</a><a className="transition-colors hover:text-courier-green" href="#for-everyone">For everyone</a><a className="transition-colors hover:text-courier-green" href="#handoff">Handoffs</a><Link className="transition-colors hover:text-courier-green" href={signInHref}>{signedIn ? "Dashboard" : "Sign in"}</Link>
                     </nav>
                     <span className="text-[11px] font-medium text-courier-muted">© {new Date().getFullYear()} Courier</span>
                 </div>
