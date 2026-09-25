@@ -11,10 +11,10 @@ const envSchema = z.object({
     SMTP_SECURE: z.enum(["true", "false"]).default("false").transform((value) => value === "true"),
     SMTP_USER: z.string().optional(),
     SMTP_PASSWORD: z.string().optional(),
-    EMAIL_FROM: z.string().min(3).max(254).refine((value) => {
+    SMTP_FROM: z.string().min(3).max(254).refine((value) => {
         const address = value.match(/^.*<([^<>]+)>$/)?.[1] ?? value;
         return z.email().safeParse(address).success;
-    }, "EMAIL_FROM must contain a valid email address.").optional(),
+    }, "SMTP_FROM must contain a valid email address.").optional(),
 }).superRefine((value, context) => {
     if (value.NODE_ENV === "production" && !value.DATABASE_URL) {
         context.addIssue({ code: "custom", path: ["DATABASE_URL"], message: "DATABASE_URL is required in production." });
@@ -22,9 +22,9 @@ const envSchema = z.object({
     if (value.NODE_ENV === "production" && !value.AUTH_SECRET) {
         context.addIssue({ code: "custom", path: ["AUTH_SECRET"], message: "AUTH_SECRET is required in production." });
     }
-    const smtpConfigured = Boolean(value.SMTP_HOST || value.SMTP_PORT || value.SMTP_USER || value.SMTP_PASSWORD || value.EMAIL_FROM);
+    const smtpConfigured = Boolean(value.SMTP_HOST || value.SMTP_PORT || value.SMTP_USER || value.SMTP_PASSWORD || value.SMTP_FROM);
     if (smtpConfigured || value.NODE_ENV === "production") {
-        for (const key of ["SMTP_HOST", "SMTP_PORT", "EMAIL_FROM"] as const) {
+        for (const key of ["SMTP_HOST", "SMTP_PORT", "SMTP_FROM"] as const) {
             if (!value[key]) {
                 context.addIssue({ code: "custom", path: [key], message: `${key} is required when email delivery is enabled.` });
             }

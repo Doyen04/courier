@@ -5,7 +5,7 @@ let transporter: Transporter | undefined;
 
 function getMailTransport() {
   const env = getEnv();
-  if (!env.SMTP_HOST || !env.SMTP_PORT || !env.EMAIL_FROM) {
+  if (!env.SMTP_HOST || !env.SMTP_PORT || !env.SMTP_FROM) {
     throw new Error("Email delivery is not configured.");
   }
 
@@ -20,7 +20,7 @@ function getMailTransport() {
     });
   }
 
-  return { transport: transporter, from: env.EMAIL_FROM };
+  return { transport: transporter, from: env.SMTP_FROM };
 }
 
 function linkFor(path: string, token: string) {

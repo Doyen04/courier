@@ -13,7 +13,7 @@ Deployments should apply committed migrations with `npx prisma migrate deploy` a
 
 ## Authentication
 
-Authentication uses Auth.js Credentials with Courier-managed email/password accounts. Registration is `POST /api/v1/auth/register`; sign-in is available only after email verification. Verification and recovery links are sent through SMTP configured with `SMTP_HOST`, `SMTP_PORT`, optional paired `SMTP_USER`/`SMTP_PASSWORD`, `SMTP_SECURE`, and `EMAIL_FROM`. Link tokens are random, stored only as SHA-256 hashes, expire, and can be used once. Password reset increments a session version so existing JWT sessions stop authorizing protected pages and APIs. Set `AUTH_SECRET` to a long random value before running the app.
+Authentication uses Auth.js Credentials with Courier-managed email/password accounts. Registration is `POST /api/v1/auth/register`; sign-in is available only after email verification. Verification and recovery links are sent through SMTP configured with `SMTP_HOST`, `SMTP_PORT`, optional paired `SMTP_USER`/`SMTP_PASSWORD`, `SMTP_SECURE`, and `SMTP_FROM`. Link tokens are random, stored only as SHA-256 hashes, expire, and can be used once. Password reset increments a session version so existing JWT sessions stop authorizing protected pages and APIs. Set `AUTH_SECRET` to a long random value before running the app.
 
 New email lifecycle schema changes require a migration. In development, after configuring PostgreSQL, run `npx prisma migrate dev --name email_verification_and_password_recovery`; deployments should apply the committed migration with `npx prisma migrate deploy`.
 

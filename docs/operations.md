@@ -4,8 +4,8 @@ This runbook describes the application-side release and support checks. The host
 
 ## Environment and deployment
 
-- Store `DATABASE_URL`, `AUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, SMTP settings (`SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, optional paired `SMTP_USER`/`SMTP_PASSWORD`, and `EMAIL_FROM`), and `COURIER_SUPPORT_USER_IDS` in the deployment platform's secret/configuration manager. Never place real values in source control or browser-exposed variables.
-- Production startup validates database/auth configuration, complete SMTP sender configuration, and an HTTPS public application URL. Use a distinct, high-entropy `AUTH_SECRET` for each environment.
+- Store `DATABASE_URL`, `AUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, SMTP settings (`SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, optional paired `SMTP_USER`/`SMTP_PASSWORD`, and `SMTP_FROM`), and `COURIER_SUPPORT_USER_IDS` in the deployment platform's secret/configuration manager. Never place real values in source control or browser-exposed variables.
+- The Next.js build and production startup validate database/auth configuration, complete SMTP sender configuration, and an HTTPS public application URL. Use a distinct, high-entropy `AUTH_SECRET` for each environment.
 - Install locked dependencies with `npm ci`. The `postinstall` hook generates Prisma Client; `npm run build` also runs Prisma generation before the Next.js build.
 - Apply committed database migrations as an explicit release step with `npx prisma migrate deploy`. Do not use `migrate dev` in production. Take a restorable database backup before schema releases that need one.
 - Keep web instances stateless. Persist operational data in PostgreSQL and secrets in the platform's secret store.
