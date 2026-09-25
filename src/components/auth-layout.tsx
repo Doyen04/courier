@@ -16,24 +16,24 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
     return (
         <main className="flex min-h-dvh flex-col bg-[#fbfaf7] text-courier-ink lg:grid lg:grid-cols-[.94fr_1.06fr]">
             <aside className="relative isolate hidden min-h-dvh flex-col overflow-hidden bg-courier-green px-5 py-5 text-white lg:flex lg:px-[clamp(36px,6vw,92px)] lg:py-8">
-                <div className="hero-orbit absolute -right-28 -top-36 size-[380px] rounded-full border border-white/10" aria-hidden="true" />
-                <div className="hero-orbit hero-orbit-slower absolute -right-8 -top-16 size-[230px] rounded-full border border-white/10" aria-hidden="true" />
+                <div className="hero-orbit absolute -right-28 -top-36 size-95 rounded-full border border-white/10" aria-hidden="true" />
+                <div className="hero-orbit hero-orbit-slower absolute -right-8 -top-16 size-57.5 rounded-full border border-white/10" aria-hidden="true" />
                 <div className="relative z-10 flex items-center justify-between gap-4">
                     <BrandMark tone="light" />
                 </div>
 
-                <div className="animate-enter relative z-10 max-w-[590px] py-10 sm:py-12 lg:my-auto lg:py-16">
+                <div className="animate-enter relative z-10 max-w-147.5 py-10 sm:py-12 lg:my-auto lg:py-16">
                     
-                    <h1 className="max-w-[600px] font-display text-[clamp(2.9rem,5.8vw,5.3rem)] font-semibold leading-[.98] tracking-[-.06em]">
+                    <h1 className="max-w-150 font-display text-[clamp(2.9rem,5.8vw,5.3rem)] font-semibold leading-[.98] tracking-[-.06em]">
                         A little closer, <span className="text-[#f1d39a]">wherever life takes you.</span>
                     </h1>
-                    <p className="mt-5 max-w-[440px] text-[14px] leading-6 text-white/75 sm:text-[15px] sm:leading-7">
+                    <p className="mt-5 max-w-110 text-[14px] leading-6 text-white/75 sm:text-[15px] sm:leading-7">
                         Connect an item that needs a journey with someone already headed that way.
                     </p>
                 </div>
 
-                <div className="relative z-10 hidden max-w-[590px] items-center gap-5 rounded-[26px] border border-white/15 bg-white/6 p-4 sm:flex lg:mt-auto lg:p-5">
-                    <svg viewBox="0 0 170 112" className="h-[88px] w-[134px] shrink-0 sm:h-[100px] sm:w-[152px]" fill="none" aria-hidden="true">
+                <div className="relative z-10 hidden max-w-147.5 items-center gap-5 rounded-[26px] border border-white/15 bg-white/6 p-4 sm:flex lg:mt-auto lg:p-5">
+                    <svg viewBox="0 0 170 112" className="h-22 w-33.5 shrink-0 sm:h-25 sm:w-38" fill="none" aria-hidden="true">
                         <path d="M18 83c30-2 33-54 68-54s33 51 66 50" stroke="#f1d39a" strokeWidth="3" strokeLinecap="round" strokeDasharray="3 8" />
                         <circle cx="18" cy="83" r="8" fill="#f1d39a" stroke="#145b4c" strokeWidth="4" />
                         <circle cx="152" cy="79" r="8" fill="white" stroke="#145b4c" strokeWidth="4" />
@@ -57,13 +57,13 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
                     </Link>
                 </div>
 
-                <div className="animate-enter-delayed mx-auto my-auto w-full max-w-[480px] py-8 sm:py-12 lg:py-14">
+                <div className="animate-enter-delayed mx-auto my-auto w-full max-w-120 py-8 sm:py-12 lg:py-14">
                     <div className="rounded-[30px] border border-courier-line bg-white p-5 sm:rounded-[34px] sm:p-8 lg:p-9">
                         <div className="mb-7 flex items-center justify-between gap-4">
                             <span className="text-[10px] font-semibold uppercase tracking-widest text-courier-muted">Secure access</span>
                         </div>
                         <h2 className="font-display text-[clamp(2.35rem,4vw,3.5rem)] font-semibold leading-[1.02] tracking-[-.055em]">{title}</h2>
-                        <p className="mt-3 max-w-[390px] text-[14px] leading-6 text-courier-muted">{description}</p>
+                        <p className="mt-3 max-w-97.5 text-[14px] leading-6 text-courier-muted">{description}</p>
                         {children}
                         <div className="mt-7 border-t border-courier-line pt-5 text-center text-[12px] text-courier-muted">
                             {isSignIn ? "New to Courier?" : isAccount ? "Returning to Courier?" : "Already have an account?"}{" "}

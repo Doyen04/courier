@@ -73,10 +73,10 @@ export function AgreementLifecycle({
           const current = index === progress;
           return (
             <div className="relative flex flex-col items-center text-center" role="listitem" key={stage}>
-              {index > 0 && <span className={`absolute right-1/2 top-[7px] h-px w-full ${complete ? "bg-courier-green" : "bg-courier-line"}`} aria-hidden="true" />}
-              <span className={`relative z-10 grid h-[15px] w-[15px] place-items-center border ${complete ? "border-courier-green bg-courier-green text-white" : current ? "border-courier-green bg-white" : "border-courier-line bg-white"}`} aria-label={complete ? "Complete" : current ? "Current" : "Upcoming"}>
+              {index > 0 && <span className={`absolute right-1/2 top-1.75 h-px w-full ${complete ? "bg-courier-green" : "bg-courier-line"}`} aria-hidden="true" />}
+              <span className={`relative z-10 grid h-3.75 w-3.75 place-items-center border ${complete ? "border-courier-green bg-courier-green text-white" : current ? "border-courier-green bg-white" : "border-courier-line bg-white"}`} aria-label={complete ? "Complete" : current ? "Current" : "Upcoming"}>
                 {complete && <span className="text-[8px] leading-none" aria-hidden="true">✓</span>}
-                {current && <span className="h-[5px] w-[5px] bg-courier-gold" aria-hidden="true" />}
+                {current && <span className="h-1.25 w-1.25 bg-courier-gold" aria-hidden="true" />}
               </span>
               <span className={`mt-2 px-1 text-[8px] leading-4 sm:text-[9px] ${current ? "font-semibold text-courier-green" : "text-courier-muted"}`}>{stage}</span>
             </div>
@@ -86,7 +86,7 @@ export function AgreementLifecycle({
 
       <div className="mt-4 grid gap-3 border-y border-courier-line py-3 sm:grid-cols-[1fr_auto] sm:items-center">
         <div className="flex min-w-0 items-center gap-3">
-          <svg className="h-[46px] w-[17px] shrink-0" viewBox="0 0 17 46" fill="none" aria-hidden="true">
+          <svg className="h-11.5 w-4.25 shrink-0" viewBox="0 0 17 46" fill="none" aria-hidden="true">
             <circle cx="8.5" cy="5" r="4" fill="#145b4c" />
             <path d="M8.5 11v24" stroke="#bd8845" strokeDasharray="2 4" />
             <rect x="4.5" y="37" width="8" height="8" fill="#bd8845" />
@@ -127,17 +127,17 @@ export function AgreementLifecycle({
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {agreement.status === "FUNDED" && isTraveler && hasProtectedFunds && !agreement.dispute && (
-          <button className="min-h-[42px] bg-courier-green px-4 text-[10px] font-semibold text-white transition-colors hover:bg-courier-green-deep disabled:cursor-wait disabled:opacity-60" type="button" disabled={submitting || Boolean(agreement.dispute)} onClick={onBeginHandoff}>
+          <button className="min-h-10.5 bg-courier-green px-4 text-[10px] font-semibold text-white transition-colors hover:bg-courier-green-deep disabled:cursor-wait disabled:opacity-60" type="button" disabled={submitting || Boolean(agreement.dispute)} onClick={onBeginHandoff}>
             {submitting ? "Updating trip…" : "Start handoff"}
           </button>
         )}
         {agreement.status === "IN_HANDOFF" && !isTraveler && hasProtectedFunds && !agreement.deliveryConfirmation && !agreement.dispute && (
-          <button className="min-h-[42px] bg-courier-green px-4 text-[10px] font-semibold text-white transition-colors hover:bg-courier-green-deep disabled:cursor-wait disabled:opacity-60" type="button" disabled={submitting} onClick={onConfirmDelivery}>
+          <button className="min-h-10.5 bg-courier-green px-4 text-[10px] font-semibold text-white transition-colors hover:bg-courier-green-deep disabled:cursor-wait disabled:opacity-60" type="button" disabled={submitting} onClick={onConfirmDelivery}>
             {submitting ? "Recording receipt…" : "Confirm I received the item"}
           </button>
         )}
         {canReportIssue && !issueActive && !agreement.dispute && (
-          <button className="min-h-[42px] border border-courier-line px-4 text-[10px] font-semibold text-courier-ink transition-colors hover:border-courier-gold disabled:opacity-60" type="button" disabled={submitting} onClick={() => setIssueOpen((open) => !open)}>
+          <button className="min-h-10.5 border border-courier-line px-4 text-[10px] font-semibold text-courier-ink transition-colors hover:border-courier-gold disabled:opacity-60" type="button" disabled={submitting} onClick={() => setIssueOpen((open) => !open)}>
             {issueOpen ? "Close support form" : "Report a handoff issue"}
           </button>
         )}
@@ -146,10 +146,10 @@ export function AgreementLifecycle({
       {issueOpen && !agreement.dispute && (
         <form className="mt-4 border border-courier-line p-4 motion-safe:animate-enter" onSubmit={submitIssue}>
           <label className="block text-[9px] font-bold uppercase tracking-[.13em] text-courier-muted" htmlFor={`issue-${agreement.id}`}>What happened?</label>
-          <textarea className="mt-2 min-h-[90px] w-full resize-y border border-courier-line bg-white p-3 text-[12px] leading-5 text-courier-ink outline-none transition-colors placeholder:text-[#a5aea7] focus:border-courier-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-courier-green/25" id={`issue-${agreement.id}`} name="reason" minLength={10} maxLength={2000} placeholder="Describe the delay, missed meetup, or item concern. Please do not include sensitive payment details." required />
+          <textarea className="mt-2 min-h-22.5 w-full resize-y border border-courier-line bg-white p-3 text-[12px] leading-5 text-courier-ink outline-none transition-colors placeholder:text-[#a5aea7] focus:border-courier-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-courier-green/25" id={`issue-${agreement.id}`} name="reason" minLength={10} maxLength={2000} placeholder="Describe the delay, missed meetup, or item concern. Please do not include sensitive payment details." required />
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
             <p className="mb-0 text-[9px] leading-4 text-courier-muted">Opening a case pauses release while support reviews it.</p>
-            <button className="min-h-[38px] bg-courier-ink px-4 text-[10px] font-semibold text-white transition-colors hover:bg-courier-green disabled:opacity-60" type="submit" disabled={submitting}>Send to support</button>
+            <button className="min-h-9.5 bg-courier-ink px-4 text-[10px] font-semibold text-white transition-colors hover:bg-courier-green disabled:opacity-60" type="submit" disabled={submitting}>Send to support</button>
           </div>
         </form>
       )}
