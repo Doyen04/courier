@@ -11,7 +11,7 @@ export function WorkspaceHeading({ eyebrow, title, description, action }: {
     return (
         <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
             <div>
-                <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-courier-gold"><span className="h-3.5 w-[3px] rounded-full bg-courier-gold" aria-hidden="true" />{eyebrow}</p>
+                <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-courier-green"><span className="h-3.5 w-0.75 rounded-full bg-courier-gold" aria-hidden="true" />{eyebrow}</p>
                 <h1 className="mb-2 font-display text-3xl font-semibold tracking-tighter sm:text-[40px]">{title}</h1>
                 <p className="mb-0 max-w-2xl text-sm leading-6 text-courier-muted">{description}</p>
             </div>
@@ -29,9 +29,10 @@ export function SecondaryButton({ children, ...props }: ButtonHTMLAttributes<HTM
 }
 
 export function StatusBadge({ status }: { status: string }) {
-    const attention = ["DISPUTED", "CANCELLED", "REFUNDED", "FAILED", "EXPIRED"].includes(status);
-    const positive = ["COMPLETED", "FUNDED", "IN_HANDOFF", "DELIVERED", "RELEASE_PENDING", "RELEASED"].includes(status);
-    return <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ${attention ? "bg-[#fff1ee] text-[#9a4035]" : positive ? "bg-[#eaf3ec] text-courier-green" : "bg-[#f2f3ef] text-courier-muted"}`}>{statusLabel(status)}</span>;
+    const attention = ["DISPUTED", "CANCELLED", "DECLINED", "REFUNDED", "FAILED", "EXPIRED"].includes(status);
+    const positive = ["ACCEPTED", "COMPLETED", "FUNDED", "IN_HANDOFF", "DELIVERED", "RELEASED"].includes(status);
+    const inProgress = ["OPEN", "MATCHED", "IN_PROGRESS", "PLANNED", "ACTIVE", "CANDIDATE", "INTERESTED", "AGREEMENT_STARTED", "AWAITING_ACCEPTANCE", "PROPOSED", "REQUIRES_ACTION", "RELEASE_PENDING", "REFUND_PENDING", "UNDER_REVIEW"].includes(status);
+    return <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ${attention ? "bg-[#fff1ee] text-[#9a4035]" : positive ? "bg-[#eaf3ec] text-courier-green" : inProgress ? "bg-[#f7efe3] text-[#805720]" : "bg-[#f2f3ef] text-courier-muted"}`}>{statusLabel(status)}</span>;
 }
 
 export function EmptyState({ title, body, href, action }: { title: string; body: string; href?: string; action?: string }) {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiRequest, type Agreement, type ItemRequest, type Itinerary } from "./dashboard-data";
-import { EmptyState, InlineMessage, LoadingPanel, WorkspaceHeading } from "./workspace-ui";
+import { EmptyState, InlineMessage, LoadingPanel, StatusBadge, WorkspaceHeading } from "./workspace-ui";
 
 export function DashboardOverview({ userName }: { userName: string }) {
     const [requests, setRequests] = useState<ItemRequest[]>([]);
@@ -49,7 +49,7 @@ export function DashboardOverview({ userName }: { userName: string }) {
                 <section className="mt-8 grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,.65fr)]">
                     <div className="rounded-2xl border border-courier-line bg-white p-5 sm:p-7">
                         <div className="mb-5 flex items-center justify-between gap-4"><div><p className="mb-1 text-[10px] font-bold uppercase tracking-[.14em] text-courier-muted">Your activity</p><h2 className="mb-0 font-display text-xl font-semibold tracking-tight">Recent requests</h2></div><Link className="text-xs font-semibold text-courier-green hover:underline" href="/dashboard/requests">View all</Link></div>
-                        {requests.length ? <div className="divide-y divide-courier-line">{requests.slice(0, 4).map((item) => <Link key={item.id} href="/dashboard/requests" className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"><div className="min-w-0"><p className="mb-1 truncate text-sm font-semibold">{item.title}</p><p className="mb-0 truncate text-xs text-courier-muted">{item.originName} → {item.destinationName}</p></div><span className="shrink-0 rounded-full bg-[#f3f5f2] px-2.5 py-1 text-[10px] font-medium capitalize text-courier-muted">{item.status.toLowerCase()}</span></Link>)}</div> : <p className="mb-0 py-6 text-sm text-courier-muted">No requests yet. Create one when you need something carried.</p>}
+                        {requests.length ? <div className="divide-y divide-courier-line">{requests.slice(0, 4).map((item) => <Link key={item.id} href="/dashboard/requests" className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"><div className="min-w-0"><p className="mb-1 truncate text-sm font-semibold">{item.title}</p><p className="mb-0 truncate text-xs text-courier-muted">{item.originName} → {item.destinationName}</p></div><StatusBadge status={item.status} /></Link>)}</div> : <p className="mb-0 py-6 text-sm text-courier-muted">No requests yet. Create one when you need something carried.</p>}
                     </div>
 
                     <div className="rounded-2xl bg-courier-green p-6 text-white sm:p-7">
@@ -65,7 +65,7 @@ export function DashboardOverview({ userName }: { userName: string }) {
 
                 <section className="mt-8 rounded-2xl border border-courier-line bg-white p-5 sm:p-7">
                     <div className="mb-5 flex items-center justify-between gap-4"><div><p className="mb-1 text-[10px] font-bold uppercase tracking-[.14em] text-courier-muted">Needs your attention</p><h2 className="mb-0 font-display text-xl font-semibold tracking-tight">Agreements in progress</h2></div><Link className="text-xs font-semibold text-courier-green hover:underline" href="/dashboard/agreements">View agreements</Link></div>
-                    {agreements.length ? <div className="grid gap-3 md:grid-cols-2">{agreements.slice(0, 4).map((agreement) => <Link key={agreement.id} href="/dashboard/agreements" className="flex items-center justify-between gap-4 rounded-xl border border-courier-line p-4 transition hover:border-courier-green"><div className="min-w-0"><p className="mb-1 truncate text-sm font-semibold">{agreement.match.request.title}</p><p className="mb-0 truncate text-xs text-courier-muted">{agreement.match.itinerary.originName} → {agreement.match.itinerary.destinationName}</p></div><span className="shrink-0 rounded-full bg-[#edf4ef] px-2.5 py-1 text-[10px] font-semibold capitalize text-courier-green">{agreement.status.toLowerCase().replaceAll("_", " ")}</span></Link>)}</div> : <EmptyState title="No agreements yet" body="When a request and journey connect, you’ll manage the details and delivery progress here." href="/dashboard/requests" action="Browse your requests" />}
+                    {agreements.length ? <div className="grid gap-3 md:grid-cols-2">{agreements.slice(0, 4).map((agreement) => <Link key={agreement.id} href="/dashboard/agreements" className="flex items-center justify-between gap-4 rounded-xl border border-courier-line p-4 transition hover:border-courier-green"><div className="min-w-0"><p className="mb-1 truncate text-sm font-semibold">{agreement.match.request.title}</p><p className="mb-0 truncate text-xs text-courier-muted">{agreement.match.itinerary.originName} → {agreement.match.itinerary.destinationName}</p></div><StatusBadge status={agreement.status} /></Link>)}</div> : <EmptyState title="No agreements yet" body="When a request and journey connect, you’ll manage the details and delivery progress here." href="/dashboard/requests" action="Browse your requests" />}
                 </section>
             </>}
         </>
