@@ -16,6 +16,50 @@ export type Match = {
 };
 
 export type MatchPanel = { matches: Match[]; matchingStatus: string };
+
+export type MatchSummary = {
+    id: string;
+    status: string;
+    score: number | string | null;
+};
+
+export type MatchingRequest = MatchSummary & {
+    request: {
+        id: string; title: string; itemCostMinor: number; currency: string;
+        originName: string; originCountryCode: string;
+        destinationName: string; destinationCountryCode: string;
+        neededBy: string | null; status: string;
+        requester: { displayName: string };
+    };
+};
+
+export type MatchingJourney = MatchSummary & {
+    itinerary: {
+        id: string; originName: string; originCountryCode: string;
+        destinationName: string; destinationCountryCode: string;
+        departureAt: string; arrivalBy: string; status: string;
+        traveler: { displayName: string };
+    };
+};
+
+export type TripMatchGroup = {
+    itinerary: {
+        id: string; originName: string; originCountryCode: string;
+        destinationName: string; destinationCountryCode: string;
+        departureAt: string; arrivalBy: string; status: string;
+    };
+    matches: MatchingRequest[];
+};
+
+export type RequestMatchGroup = {
+    request: {
+        id: string; title: string; itemCostMinor: number; currency: string;
+        originName: string; originCountryCode: string;
+        destinationName: string; destinationCountryCode: string;
+        neededBy: string | null; status: string;
+    };
+    matches: MatchingJourney[];
+};
 export type TermsRevision = {
     id: string; revision: number; deliveryFeeMinor: number; totalMinor: number; currency: string; status: string;
     handoffDetails: { notes?: string; suggestedMeetup?: string | null } | null;
@@ -110,6 +154,12 @@ export function dateLabel(value: string | null) {
 
 export function statusLabel(status: string) {
     return status.toLowerCase().replaceAll("_", " ");
+}
+
+export function fitPercent(score: number | string | null) {
+    const value = Number(score);
+    if (!Number.isFinite(value)) return null;
+    return Math.round(value * 100);
 }
 
 export function toLocalDateTimeInput(value: string) {

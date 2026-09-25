@@ -10,6 +10,8 @@ const navigation = [
     { href: "/dashboard", label: "Overview", icon: "overview" },
     { href: "/dashboard/requests", label: "My requests", icon: "requests" },
     { href: "/dashboard/journeys", label: "My journeys", icon: "journeys" },
+    { href: "/dashboard/matches/requests", label: "Requests for my trips", icon: "trip-matches" },
+    { href: "/dashboard/matches/journeys", label: "Journeys for my requests", icon: "journey-matches" },
     { href: "/dashboard/agreements", label: "Agreements", icon: "agreements" },
     { href: "/dashboard/profile", label: "Profile", icon: "profile" },
 ];
@@ -20,6 +22,8 @@ function NavIcon({ name }: { name: string }) {
             {name === "overview" && <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" />}
             {name === "requests" && <><path d="M5 4h14v16H5z" /><path d="M8 8h8M8 12h8M8 16h5" /></>}
             {name === "journeys" && <><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="6" r="2.5" /><path d="M8.5 18h2a3 3 0 0 0 3-3V9a3 3 0 0 1 3-3h1" /></>}
+            {name === "trip-matches" && <><path d="M4 7h16M4 12h10M4 17h7" /><path d="m15 16 2 2 4-4" /></>}
+            {name === "journey-matches" && <><path d="M4 17c3-6 6-6 8-6s5 0 8-4" /><circle cx="4" cy="17" r="1.8" /><circle cx="20" cy="7" r="1.8" /></>}
             {name === "agreements" && <><path d="M6 3h9l4 4v14H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" /><path d="M14 3v5h5M8 13h8m-8 4h6" /></>}
             {name === "profile" && <><circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></>}
             {name === "support" && <><path d="m12 3 8 4v5c0 5-3.4 7.8-8 9-4.6-1.2-8-4-8-9V7l8-4Z" /><path d="m9 12 2 2 4-4" /></>}
