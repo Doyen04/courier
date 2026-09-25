@@ -72,7 +72,7 @@ export function DashboardShell({
                             const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
                             return (
                                 <Link key={href} href={href} onClick={closeMobile} aria-current={active ? "page" : undefined} title={collapsed ? label : undefined}
-                                    className={`relative flex min-h-12 items-center gap-3 rounded-xl px-3 text-[13px] font-medium transition-colors ${active ? "bg-[#eaf2ec] text-courier-green before:absolute before:bottom-3 before:left-0 before:top-3 before:w-[3px] before:rounded-full before:bg-courier-gold" : "text-[#66736c] hover:bg-[#f5f6f3] hover:text-courier-ink"} ${collapsed ? "lg:justify-center lg:px-0" : ""}`}>
+                                    className={`relative flex min-h-12 items-center gap-3 rounded-xl px-3 text-[13px] font-medium transition-colors ${active ? "bg-[#eaf2ec] text-courier-green before:absolute before:bottom-3 before:left-0 before:top-3 before:w-0.75 before:rounded-full before:bg-courier-gold" : "text-[#66736c] hover:bg-[#f5f6f3] hover:text-courier-ink"} ${collapsed ? "lg:justify-center lg:px-0" : ""}`}>
                                     <span className={`grid size-8 shrink-0 place-items-center rounded-lg ${active ? "bg-[#f7efe3] text-courier-gold" : "bg-black/[.035] text-courier-green"}`}><NavIcon name={icon} /></span>
                                     <span className={collapsed ? "lg:hidden" : ""}>{label}</span>
                                 </Link>
