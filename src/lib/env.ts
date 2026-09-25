@@ -58,11 +58,5 @@ export function getEnv(): AppEnv {
 }
 
 export function getDatabaseUrl(): string {
-    const { DATABASE_URL } = getEnv();
-
-    if (!DATABASE_URL) {
-        throw new Error("DATABASE_URL is required to use the database.");
-    }
-
-    return DATABASE_URL;
+    return z.string().url().parse(process.env.DATABASE_URL);
 }
