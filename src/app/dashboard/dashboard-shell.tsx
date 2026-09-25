@@ -99,10 +99,11 @@ export function DashboardShell({
                 <header className="sticky top-0 z-30 flex h-19 items-center justify-between border-b border-courier-line bg-white/95 px-4 backdrop-blur sm:px-8 lg:px-10">
                     <div className="flex min-w-0 items-center gap-3">
                         <button className="grid size-10 place-items-center rounded-xl border border-courier-line lg:hidden" type="button" aria-label="Open navigation" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}><MenuIcon /></button>
-                        <button className="hidden size-10 place-items-center rounded-xl border border-courier-line text-courier-muted transition hover:border-courier-green hover:text-courier-green lg:grid" type="button" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-pressed={collapsed} onClick={() => setCollapsed((value) => !value)}><CollapseIcon collapsed={collapsed} /></button>
+                        <button className="hidden size-10 place-items-center rounded-xl border border-courier-line text-courier-muted transition hover:border-courier-green hover:text-courier-green lg:grid" type="button" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-pressed={collapsed} onClick={() => setCollapsed((value) => !value)}>
+                            <CollapseIcon collapsed={collapsed} />
+                        </button>
                         <div className="min-w-0"><p className="mb-0 text-[10px] font-semibold uppercase tracking-[.15em] text-courier-muted">Courier workspace</p><p className="mb-0 truncate text-sm font-semibold">{currentPage?.label ?? "Workspace"}</p></div>
                     </div>
-                    <span className="hidden text-xs text-courier-muted sm:block">Good things, moving together.</span>
                 </header>
                 <main className="mx-auto min-h-[calc(100dvh-76px)] w-full max-w-375 px-4 py-7 sm:px-8 sm:py-9 lg:px-10 xl:px-12">{children}</main>
             </div>
