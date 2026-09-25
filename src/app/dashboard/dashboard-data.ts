@@ -35,15 +35,44 @@ export type Agreement = {
     termsRevisions: TermsRevision[];
 };
 
+export type ApiErrorDetail = { path: Array<string | number>; message: string; code?: string };
+
+export class ApiRequestError extends Error {
+    constructor(message: string, readonly code: string, readonly details: ApiErrorDetail[] = []) {
+        super(message);
+        this.name = "ApiRequestError";
+    }
+}
+
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
     const response = await fetch(path, {
         ...init,
         cache: "no-store",
         headers: { ...(init?.body ? { "content-type": "application/json" } : {}), ...init?.headers },
     });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error?.message ?? "Courier could not complete that request.");
-    return payload.data as T;
+    const payload = (await response.json().catch(() => null)) as {
+        data?: T;
+        error?: { code?: string; message?: string; details?: ApiErrorDetail[] };
+    } | null;
+
+    if (!response.ok) {
+        throw new ApiRequestError(
+            payload?.error?.message ?? "Courier could not complete that request.",
+            payload?.error?.code ?? "INTERNAL_ERROR",
+            Array.isArray(payload?.error?.details) ? payload.error.details : [],
+        );
+    }
+    return payload?.data as T;
+}
+
+export function validationFieldErrors(error: unknown): Record<string, string> {
+    if (!(error instanceof ApiRequestError)) return {};
+    const fields: Record<string, string> = {};
+    for (const detail of error.details) {
+        const key = detail.path.map(String).join(".");
+        if (key && !(key in fields)) fields[key] = detail.message;
+    }
+    return fields;
 }
 
 export function formatMoney(minor: number, currency: string) {
