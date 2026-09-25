@@ -32,7 +32,8 @@ const envSchema = z.object({
         if (Boolean(value.SMTP_USER) !== Boolean(value.SMTP_PASSWORD)) {
             context.addIssue({ code: "custom", path: ["SMTP_USER"], message: "SMTP_USER and SMTP_PASSWORD must be configured together." });
         }
-        if (value.NODE_ENV === "production" && new URL(value.NEXT_PUBLIC_APP_URL).protocol !== "https:") {
+        const appUrl = z.url().safeParse(value.NEXT_PUBLIC_APP_URL);
+        if (value.NODE_ENV === "production" && appUrl.success && new URL(appUrl.data).protocol !== "https:") {
             context.addIssue({ code: "custom", path: ["NEXT_PUBLIC_APP_URL"], message: "Production app URL must use HTTPS." });
         }
     }
