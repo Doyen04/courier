@@ -53,12 +53,12 @@ export function DashboardOverview({ userName }: { userName: string }) {
                     </div>
 
                     <div className="rounded-2xl bg-courier-green p-6 text-white sm:p-7">
-                        <p className="mb-2 text-[10px] font-bold uppercase tracking-[.15em] text-[#e2c792]">Get started</p>
+                        <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.15em] text-[#f1d39a]"><span className="size-2 rounded-full bg-courier-gold ring-4 ring-courier-gold/20" aria-hidden="true" />Get started</p>
                         <h2 className="mb-2 max-w-xs font-display text-2xl font-semibold leading-tight tracking-[-.04em]">Connect a need with a journey.</h2>
                         <p className="mb-5 text-sm leading-6 text-white/70">Post what you need, or share a route you already have planned.</p>
                         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
                             <Link className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 text-xs font-semibold text-courier-green hover:bg-[#f2f6f2]" href="/dashboard/requests?new=1">Create a request</Link>
-                            <Link className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/35 px-4 text-xs font-semibold text-white hover:bg-white/10" href="/dashboard/journeys?new=1">Share a journey</Link>
+                            <Link className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#d7ad72] px-4 text-xs font-semibold text-white transition hover:bg-courier-gold/20" href="/dashboard/journeys?new=1">Share a journey</Link>
                         </div>
                     </div>
                 </section>
@@ -73,9 +73,9 @@ export function DashboardOverview({ userName }: { userName: string }) {
 }
 
 function SummaryCard({ label, value, href, tint }: { label: string; value: number; href: string; tint: "green" | "gold" | "blue" }) {
-    const iconColor = { green: "text-courier-green", gold: "text-courier-gold", blue: "text-[#52727a]" }[tint];
-    return <Link href={href} className="group rounded-2xl border border-courier-line bg-white p-5 transition hover:-translate-y-0.5 hover:border-[#c9d9cc] hover:shadow-[0_10px_30px_rgba(25,61,53,.06)]">
-        <div className="flex items-start justify-between"><span className="text-xs font-medium text-courier-muted">{label}</span><span className={`text-lg ${iconColor}`} aria-hidden="true">↗</span></div>
+    const tone = { green: "bg-[#eaf3ec] text-courier-green", gold: "bg-[#f7efe3] text-courier-gold", blue: "bg-[#edf3f4] text-[#52727a]" }[tint];
+    return <Link href={href} className={`group rounded-2xl border border-courier-line border-t-2 bg-white p-5 transition hover:-translate-y-0.5 hover:border-[#c9d9cc] hover:shadow-[0_10px_30px_rgba(25,61,53,.06)] ${tint === "gold" ? "border-t-courier-gold" : tint === "green" ? "border-t-courier-green" : "border-t-[#52727a]"}`}>
+        <div className="flex items-start justify-between"><span className="text-xs font-medium text-courier-muted">{label}</span><span className={`grid size-8 place-items-center rounded-lg text-base ${tone}`} aria-hidden="true">↗</span></div>
         <p className="mb-0 mt-5 font-display text-4xl font-semibold tracking-[-.06em]">{value.toString().padStart(2, "0")}</p>
         <span className="mt-2 block text-[11px] font-medium text-courier-muted group-hover:text-courier-green">View details</span>
     </Link>;

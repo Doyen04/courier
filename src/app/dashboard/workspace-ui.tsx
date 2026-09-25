@@ -11,7 +11,7 @@ export function WorkspaceHeading({ eyebrow, title, description, action }: {
     return (
         <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
             <div>
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-[.16em] text-courier-green">{eyebrow}</p>
+                <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-courier-gold"><span className="h-3.5 w-[3px] rounded-full bg-courier-gold" aria-hidden="true" />{eyebrow}</p>
                 <h1 className="mb-2 font-display text-3xl font-semibold tracking-tighter sm:text-[40px]">{title}</h1>
                 <p className="mb-0 max-w-2xl text-sm leading-6 text-courier-muted">{description}</p>
             </div>
