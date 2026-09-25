@@ -15,7 +15,7 @@ const navigation = [
 ];
 
 function NavIcon({ name }: { name: string }) {
-    return <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    return <svg viewBox="0 0 24 24" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         {name === "overview" && <><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" /></>}
         {name === "requests" && <><path d="M5 4h14v16H5z" /><path d="M8 8h8M8 12h8M8 16h5" /></>}
         {name === "journeys" && <><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="6" r="2.5" /><path d="M8.5 18h2a3 3 0 0 0 3-3V9a3 3 0 0 1 3-3h1" /></>}
@@ -53,8 +53,8 @@ export function DashboardShell({
         <div className="min-h-dvh bg-[#f6f7f4] text-courier-ink">
             {mobileOpen && <button className="fixed inset-0 z-40 bg-[#142b25]/45 lg:hidden" aria-label="Close navigation" onClick={closeMobile} />}
 
-            <aside className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-courier-line bg-white transition-[width,transform] duration-200 lg:translate-x-0 ${sidebarWidth} ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`} aria-label="Main navigation">
-                <div className={`flex h-[76px] items-center border-b border-courier-line ${collapsed ? "justify-center px-3" : "justify-between px-5"}`}>
+            <aside className={`dashboard-sidebar fixed inset-y-0 left-0 z-50 flex w-68 flex-col border-r border-courier-line bg-white transition-[width,transform] duration-200 lg:translate-x-0 ${sidebarWidth} ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`} aria-label="Main navigation">
+                <div className={`flex h-19 items-center border-b border-courier-line ${collapsed ? "justify-center px-3" : "justify-between px-5"}`}>
                     {!collapsed && <BrandMark />}
                     {collapsed && <span className="grid size-10 place-items-center rounded-xl bg-courier-green text-sm font-bold text-white" aria-label="Courier">C</span>}
                     <button className="hidden size-9 place-items-center rounded-lg text-courier-muted hover:bg-[#f3f5f2] hover:text-courier-ink lg:grid" type="button" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => setCollapsed((value) => !value)}>
@@ -94,14 +94,14 @@ export function DashboardShell({
             </aside>
 
             <div className={contentOffset}>
-                <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-courier-line bg-white/95 px-4 backdrop-blur sm:px-8 lg:px-10">
+                <header className="sticky top-0 z-30 flex h-19 items-center justify-between border-b border-courier-line bg-white/95 px-4 backdrop-blur sm:px-8 lg:px-10">
                     <div className="flex min-w-0 items-center gap-3">
                         <button className="grid size-10 place-items-center rounded-xl border border-courier-line text-lg lg:hidden" type="button" aria-label="Open navigation" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}>☰</button>
                         <div className="min-w-0"><p className="mb-0 text-[10px] font-semibold uppercase tracking-[.15em] text-courier-muted">Courier workspace</p><p className="mb-0 truncate text-sm font-semibold">{navigation.find(({ href }) => href === "/dashboard" ? pathname === href : pathname.startsWith(href))?.label ?? "Workspace"}</p></div>
                     </div>
                     <span className="hidden text-xs text-courier-muted sm:block">Good things, moving together.</span>
                 </header>
-                <main className="mx-auto min-h-[calc(100dvh-76px)] w-full max-w-[1500px] px-4 py-7 sm:px-8 sm:py-9 lg:px-10 xl:px-12">{children}</main>
+                <main className="mx-auto min-h-[calc(100dvh-76px)] w-full max-w-375 px-4 py-7 sm:px-8 sm:py-9 lg:px-10 xl:px-12">{children}</main>
             </div>
         </div>
     );

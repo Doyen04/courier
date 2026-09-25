@@ -12,7 +12,7 @@ export function WorkspaceHeading({ eyebrow, title, description, action }: {
         <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
             <div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[.16em] text-courier-green">{eyebrow}</p>
-                <h1 className="mb-2 font-display text-3xl font-semibold tracking-[-.05em] sm:text-[40px]">{title}</h1>
+                <h1 className="mb-2 font-display text-3xl font-semibold tracking-tighter sm:text-[40px]">{title}</h1>
                 <p className="mb-0 max-w-2xl text-sm leading-6 text-courier-muted">{description}</p>
             </div>
             {action}
