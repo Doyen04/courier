@@ -143,69 +143,6 @@ main#top section[id] {
   line-height: 1.55;
 }
 
-.dashboard-shell {
-  background: #fbfaf7;
-}
-
-.dashboard-shell > header {
-  border-color: #e4e9e5;
-}
-
-.dashboard-sidebar {
-  border-right: 1px solid #e4e9e5;
-}
-
-.dashboard-shell button {
-  border-radius: 999px;
-  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
-}
-
-.dashboard-shell button:active:not(:disabled) {
-  transform: scale(.985);
-}
-
-.dashboard-shell aside nav button[aria-current="page"] {
-  border-radius: 16px;
-}
-
-.dashboard-shell article {
-  border-radius: 24px;
-  border-color: #e4e9e5;
-  transition: border-color 220ms ease, transform 220ms ease;
-}
-
-.dashboard-shell article:hover {
-  border-color: #cfddd2;
-}
-
-.dashboard-shell form:not([aria-busy]) {
-  border-radius: 22px;
-}
-
-.dashboard-shell textarea.auth-input {
-  min-height: 84px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.dashboard-shell [role="status"] {
-  border-radius: 16px;
-}
-
-.dashboard-shell [role="alert"] {
-  border-radius: 16px;
-}
-
-.dashboard-mobile-nav {
-  padding-bottom: max(env(safe-area-inset-bottom), 8px);
-}
-
-@media (hover: hover) {
-  .dashboard-shell article:hover {
-    transform: translateY(-2px);
-  }
-}
-
 .support-workspace-shell article {
   overflow: hidden;
   border: 1px solid #e4e9e5;

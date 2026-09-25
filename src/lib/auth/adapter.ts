@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/prisma";
 export type AuthenticatedUser = {
     id: string;
     name: string;
+    email: string;
 };
 
 /** Provider boundary: the configured adapter must resolve a provider identity to an active local user. */
@@ -24,10 +25,10 @@ export async function getCurrentAuthenticatedUser() {
 
     const activeUser = await prisma.user.findFirst({
         where: { id: userId, disabledAt: null, emailVerifiedAt: { not: null } },
-        select: { id: true, displayName: true, sessionVersion: true },
+        select: { id: true, email: true, displayName: true, sessionVersion: true },
     });
     return activeUser && activeUser.sessionVersion === session.user.sessionVersion
-        ? { id: activeUser.id, name: activeUser.displayName }
+        ? { id: activeUser.id, name: activeUser.displayName, email: activeUser.email }
         : null;
 }
 

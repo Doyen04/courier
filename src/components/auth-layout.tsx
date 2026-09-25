@@ -52,16 +52,10 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
 
                 <div className="mb-8 flex items-center justify-between gap-4 lg:hidden">
                     <BrandMark />
-                    {/* <Link className="inline-flex min-h-10 items-center gap-2 rounded-full border border-courier-line bg-white px-3.5 text-[11px] font-semibold text-courier-green transition-colors hover:border-courier-green sm:px-4 sm:text-[12px]" href="/">
-                        <span aria-hidden="true">←</span> Home
-                    </Link> */}
                 </div>
 
                 <div className="animate-enter-delayed mx-auto my-auto w-full max-w-120 py-8 sm:py-12 lg:py-14">
                     <div className="rounded-[30px] border border-courier-line bg-white p-5 sm:rounded-[34px] sm:p-8 lg:p-9">
-                        <div className="mb-7 flex items-center justify-between gap-4">
-                            <span className="text-[10px] font-semibold uppercase tracking-widest text-courier-muted">Secure access</span>
-                        </div>
                         <h2 className="font-display text-[clamp(2.35rem,4vw,3.5rem)] font-semibold leading-[1.02] tracking-[-.055em]">{title}</h2>
                         <p className="mt-3 max-w-97.5 text-[14px] leading-6 text-courier-muted">{description}</p>
                         {children}
