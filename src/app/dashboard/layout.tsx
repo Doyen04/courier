@@ -1,14 +1,17 @@
-import { redirect } from "next/navigation";
-import { getCurrentAuthenticatedUser } from "@/lib/auth/adapter";
+import { auth } from "@/auth";
 import { isSupportUser } from "@/lib/auth/support-access";
 import { DashboardShell } from "./dashboard-shell";
 
 export default async function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-    const user = await getCurrentAuthenticatedUser();
-    if (!user) redirect("/sign-in");
+    const session = await auth();
+    const user = session?.user;
 
     return (
-        <DashboardShell userName={user.name} userEmail={user.email} supportAccess={isSupportUser(user.id)}>
+        <DashboardShell
+            userName={user?.name ?? "Courier member"}
+            userEmail={user?.email ?? ""}
+            supportAccess={Boolean(user?.id && isSupportUser(user.id))}
+        >
             {children}
         </DashboardShell>
     );

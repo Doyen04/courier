@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { prisma } from "@/lib/db/prisma";
+import { getActiveSessionUser } from "@/lib/auth/active-session";
 
 export type AuthenticatedUser = {
     id: string;
@@ -23,11 +23,8 @@ export async function getCurrentAuthenticatedUser() {
     const userId = session?.user?.id;
     if (!userId) return null;
 
-    const activeUser = await prisma.user.findFirst({
-        where: { id: userId, disabledAt: null, emailVerifiedAt: { not: null } },
-        select: { id: true, email: true, displayName: true, sessionVersion: true },
-    });
-    return activeUser && activeUser.sessionVersion === session.user.sessionVersion
+    const activeUser = await getActiveSessionUser(userId, session.user.sessionVersion);
+    return activeUser
         ? { id: activeUser.id, name: activeUser.displayName, email: activeUser.email }
         : null;
 }

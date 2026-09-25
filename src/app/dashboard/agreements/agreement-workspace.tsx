@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { AgreementLifecycle } from "@/components/agreement-lifecycle";
 import { apiRequest, dateLabel, formatMoney, moneyToMinor, type Agreement } from "../dashboard-data";
-import { EmptyState, fieldClass, InlineMessage, labelClass, LoadingPanel, PrimaryButton, SecondaryButton, StatusBadge, WorkspaceHeading } from "../workspace-ui";
+import { EmptyState, fieldClass, InlineMessage, labelClass, LoadingPanel, PrimaryButton, StatusBadge, WorkspaceHeading } from "../workspace-ui";
 
 export function AgreementWorkspace({ userId }: { userId: string }) {
     const [items, setItems] = useState<Agreement[]>([]);
@@ -23,7 +23,10 @@ export function AgreementWorkspace({ userId }: { userId: string }) {
         }
     }, []);
 
-    useEffect(() => { void refresh(); }, [refresh]);
+    useEffect(() => {
+        const timer = window.setTimeout(() => { void refresh(); }, 0);
+        return () => window.clearTimeout(timer);
+    }, [refresh]);
 
     async function runAction(action: () => Promise<unknown>, successMessage: string) {
         setSubmitting(true);

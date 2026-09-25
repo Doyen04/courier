@@ -4,13 +4,13 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { apiRequest, dateLabel, parseRouteStops, type Itinerary, type MatchPanel, toLocalDateTimeInput } from "../dashboard-data";
 import { EmptyState, fieldClass, InlineMessage, labelClass, LoadingPanel, PrimaryButton, SecondaryButton, StatusBadge, WorkspaceHeading } from "../workspace-ui";
 
-export function JourneysWorkspace() {
+export function JourneysWorkspace({ initiallyOpen = false }: { initiallyOpen?: boolean }) {
     const [items, setItems] = useState<Itinerary[]>([]);
     const [matches, setMatches] = useState<Record<string, MatchPanel>>({});
     const [matching, setMatching] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [formOpen, setFormOpen] = useState(false);
+    const [formOpen, setFormOpen] = useState(initiallyOpen);
     const [error, setError] = useState<string | null>(null);
     const [notice, setNotice] = useState<string | null>(null);
 
@@ -27,8 +27,8 @@ export function JourneysWorkspace() {
     }, []);
 
     useEffect(() => {
-        setFormOpen(new URLSearchParams(window.location.search).has("new"));
-        void refresh();
+        const timer = window.setTimeout(() => { void refresh(); }, 0);
+        return () => window.clearTimeout(timer);
     }, [refresh]);
 
     async function loadMatches(id: string) {

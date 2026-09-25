@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export function BrandMark({ tone = "default" }: { tone?: "default" | "light" }) {
+export function BrandMark({ tone = "default", compact = false }: { tone?: "default" | "light"; compact?: boolean }) {
     const isLight = tone === "light";
 
     return (
@@ -12,7 +12,7 @@ export function BrandMark({ tone = "default" }: { tone?: "default" | "light" }) 
                     <circle cx="18" cy="10.8" r="1.1" fill={isLight ? "#145b4c" : "white"} />
                 </svg>
             </span>
-            <span className={`font-display text-[23px] leading-none tracking-[-.055em] sm:text-[25px] ${isLight ? "text-white" : "text-courier-ink"}`}>Courier<span className={isLight ? "text-[#f1d39a]" : "text-courier-gold"}>.</span></span>
+            {!compact && <span className={`font-display text-[23px] leading-none tracking-[-.055em] sm:text-[25px] ${isLight ? "text-white" : "text-courier-ink"}`}>Courier<span className={isLight ? "text-[#f1d39a]" : "text-courier-gold"}>.</span></span>}
         </Link>
     );
 }

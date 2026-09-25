@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { apiRequest, dateLabel, formatMoney, minorToMajorInput, moneyToMinor, type ItemRequest, type MatchPanel } from "../dashboard-data";
 import { EmptyState, fieldClass, InlineMessage, labelClass, LoadingPanel, PrimaryButton, SecondaryButton, StatusBadge, WorkspaceHeading } from "../workspace-ui";
 
-export function RequestsWorkspace() {
+export function RequestsWorkspace({ initiallyOpen = false }: { initiallyOpen?: boolean }) {
     const router = useRouter();
     const [items, setItems] = useState<ItemRequest[]>([]);
     const [matches, setMatches] = useState<Record<string, MatchPanel>>({});
     const [matching, setMatching] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [formOpen, setFormOpen] = useState(false);
+    const [formOpen, setFormOpen] = useState(initiallyOpen);
     const [error, setError] = useState<string | null>(null);
     const [notice, setNotice] = useState<string | null>(null);
 
@@ -29,8 +29,8 @@ export function RequestsWorkspace() {
     }, []);
 
     useEffect(() => {
-        setFormOpen(new URLSearchParams(window.location.search).has("new"));
-        void refresh();
+        const timer = window.setTimeout(() => { void refresh(); }, 0);
+        return () => window.clearTimeout(timer);
     }, [refresh]);
 
     async function loadMatches(id: string) {
