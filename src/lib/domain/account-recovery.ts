@@ -3,7 +3,7 @@ import { AuthTokenPurpose, Prisma } from "@/generated/prisma/client";
 import { hashPassword } from "@/lib/auth/password";
 import { clearLoginFailures } from "@/lib/auth/rate-limit";
 import { prisma } from "@/lib/db/prisma";
-import { logger } from "@/lib/logging/logger";
+import { errorFields, logger } from "@/lib/logging/logger";
 import {
     assertEmailDeliveryConfigured,
     sendPasswordChangedEmail,
@@ -72,7 +72,7 @@ export async function registerWithVerification(input: {
         if (token) await sendVerificationEmail(input.email, token);
     } catch (error) {
         logger.error("auth.verification_email.failed", {
-            errorName: error instanceof Error ? error.name : "UnknownError",
+            ...errorFields(error),
         });
     }
     return true;

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { ApiProblem } from "@/lib/http/api-problem";
 import { refreshMatchesForItinerary } from "@/lib/domain/matching";
-import { logger } from "@/lib/logging/logger";
+import { errorFields, logger } from "@/lib/logging/logger";
 import type {
   createItinerarySchema,
   itineraryListQuerySchema,
@@ -20,7 +20,7 @@ async function refreshMatchesSafely(itineraryId: string, travelerId: string) {
     logger.warn("matching.refresh.failed", {
       entityType: "Itinerary",
       entityId: itineraryId,
-      errorName: error instanceof Error ? error.name : "UnknownError",
+      ...errorFields(error),
     });
   }
 }

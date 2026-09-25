@@ -2,7 +2,7 @@ import { registerAccountSchema } from "@/lib/domain/auth-schemas";
 import { registerWithVerification } from "@/lib/domain/account-recovery";
 import { apiError, apiSuccess, getRequestId } from "@/lib/http/api-response";
 import { parseJsonBody } from "@/lib/http/parse-json";
-import { logger } from "@/lib/logging/logger";
+import { errorFields, logger } from "@/lib/logging/logger";
 
 export async function POST(request: Request) {
   const requestId = getRequestId(request);
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   } catch (error) {
     logger.error("auth.registration.failed", {
       requestId,
-      errorName: error instanceof Error ? error.name : "UnknownError",
+      ...errorFields(error),
     });
     return apiError(
       { code: "INTERNAL_ERROR", message: "The account could not be created right now." },

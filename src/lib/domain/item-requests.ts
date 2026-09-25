@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { ApiProblem } from "@/lib/http/api-problem";
 import { refreshMatchesForRequest } from "@/lib/domain/matching";
-import { logger } from "@/lib/logging/logger";
+import { errorFields, logger } from "@/lib/logging/logger";
 import type {
   createItemRequestSchema,
   requestListQuerySchema,
@@ -20,7 +20,7 @@ async function refreshMatchesSafely(requestId: string) {
     logger.warn("matching.refresh.failed", {
       entityType: "ItemRequest",
       entityId: requestId,
-      errorName: error instanceof Error ? error.name : "UnknownError",
+      ...errorFields(error),
     });
   }
 }

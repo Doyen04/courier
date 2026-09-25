@@ -2,7 +2,7 @@ import { requestPasswordReset } from "@/lib/domain/account-recovery";
 import { emailAddressSchema } from "@/lib/domain/auth-schemas";
 import { apiSuccess, getRequestId } from "@/lib/http/api-response";
 import { parseJsonBody } from "@/lib/http/parse-json";
-import { logger } from "@/lib/logging/logger";
+import { errorFields, logger } from "@/lib/logging/logger";
 
 export async function POST(request: Request) {
     const requestId = getRequestId(request);
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     } catch (error) {
         logger.error("auth.password_reset_request.failed", {
             requestId,
-            errorName: error instanceof Error ? error.name : "UnknownError",
+            ...errorFields(error),
         });
         // Keep account existence private when mail delivery is temporarily unavailable.
     }

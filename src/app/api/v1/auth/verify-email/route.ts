@@ -2,7 +2,7 @@ import { verifyEmailToken } from "@/lib/domain/account-recovery";
 import { authTokenSchema } from "@/lib/domain/auth-schemas";
 import { apiError, apiSuccess, getRequestId } from "@/lib/http/api-response";
 import { parseJsonBody } from "@/lib/http/parse-json";
-import { logger } from "@/lib/logging/logger";
+import { errorFields, logger } from "@/lib/logging/logger";
 
 export async function POST(request: Request) {
   const requestId = getRequestId(request);
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   } catch (error) {
     logger.error("auth.email_verification.failed", {
       requestId,
-      errorName: error instanceof Error ? error.name : "UnknownError",
+      ...errorFields(error),
     });
     return apiError({ code: "INTERNAL_ERROR", message: "We could not verify that link right now." }, requestId, 500);
   }

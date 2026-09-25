@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { apiError, apiSuccess, getRequestId } from "@/lib/http/api-response";
-import { logger } from "@/lib/logging/logger";
+import { errorFields, logger } from "@/lib/logging/logger";
 
 export async function GET(request: Request) {
   const requestId = getRequestId(request);
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   } catch (error) {
     logger.error("readiness.database.failed", {
       requestId,
-      errorName: error instanceof Error ? error.name : "UnknownError",
+      ...errorFields(error),
     });
     return apiError(
       { code: "SERVICE_UNAVAILABLE", message: "The service is not ready." },
