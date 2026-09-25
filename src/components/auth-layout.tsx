@@ -52,9 +52,9 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
 
                 <div className="mb-8 flex items-center justify-between gap-4 lg:hidden">
                     <BrandMark />
-                    <Link className="inline-flex min-h-10 items-center gap-2 rounded-full border border-courier-line bg-white px-3.5 text-[11px] font-semibold text-courier-green transition-colors hover:border-courier-green sm:px-4 sm:text-[12px]" href="/">
+                    {/* <Link className="inline-flex min-h-10 items-center gap-2 rounded-full border border-courier-line bg-white px-3.5 text-[11px] font-semibold text-courier-green transition-colors hover:border-courier-green sm:px-4 sm:text-[12px]" href="/">
                         <span aria-hidden="true">←</span> Home
-                    </Link>
+                    </Link> */}
                 </div>
 
                 <div className="animate-enter-delayed mx-auto my-auto w-full max-w-120 py-8 sm:py-12 lg:py-14">
@@ -71,9 +71,6 @@ export function AuthLayout({ children, title, description, mode }: AuthLayoutPro
                                 {isSignIn ? "Create an account" : "Sign in"}
                             </Link>
                         </div>
-                    </div>
-                    <div className="mt-5 flex items-center justify-between px-1 text-[10px] font-medium text-courier-muted">
-                        <span></span><Link className="transition-colors hover:text-courier-green" href="/">Return to homepage</Link>
                     </div>
                 </div>
             </section>

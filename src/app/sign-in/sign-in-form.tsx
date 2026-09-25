@@ -27,7 +27,7 @@ export function SignInForm() {
         });
 
         if (!result || result.error) {
-            setError("That email and password combination could not be verified.");
+            setError("We couldn't sign you in. Check your email and password, or request a verification link if your email isn't verified yet.");
             setIsLoading(false);
             return;
         }
